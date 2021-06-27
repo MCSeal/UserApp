@@ -1,0 +1,22 @@
+<div class="backdrop"></div>
+<header class="main-header">
+    <button id="side-menu-toggle">Menu</button>
+    <nav class="main-header__nav">
+        <ul class="main-header__item-list">
+            <li class="main-header__item">
+                <a class="<%= path === '/' ? 'active' : '' %>" href="/">Login</a>
+            </li>
+
+
+        </ul>
+        <ul class="main-header__item-list">
+                <li class="main-header__item">
+                    <a class="<%= path === '/signup' ? 'active' : '' %>" href="/signup">Signup</a>
+                </li>
+                <li class="main-header__item">
+                    <form action="/logout" method="post">
+                        <button type="submit">Logout</button>
+                    </form>
+        </ul>
+    </nav>
+</header>
