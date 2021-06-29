@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser')
 const path = require('path')
 const keys = require('./private/keys')
-
+//messaging flashing
+const flash = require('connect-flash');
 
 //mongoose 
 const mongoose = require('mongoose');
@@ -18,7 +19,7 @@ const MONGODB_CREDS = keys.MONGODB
 const app = express();
 
 
-const store = new MongoDBStore({
+const userApp = new MongoDBStore({
     uri: MONGODB_CREDS,
     collection: 'sessions'
 })
@@ -33,8 +34,19 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 //for css
 app.use(express.static(path.join(__dirname, 'public')));
+//middle ware for sessions
 
-app.use(loginRoutes)
+app.use(
+    session({
+        secret:keys.SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: userApp 
+    })
+);
+
+app.use(flash());
+app.use(loginRoutes);
 
 
 mongoose.connect(MONGODB_CREDS)

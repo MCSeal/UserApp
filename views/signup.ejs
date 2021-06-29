@@ -13,7 +13,10 @@
     <%- include('./navigation.ejs') %>
 
     <main>
-        <form class="login-form" action="/signup" method="POST" novalidate>
+        <% if (errorMessage) { %>
+            <div class= "user-message user-message--error"><%= errorMessage %></div>
+        <% } %>
+        <form class="login-form" action="/signup" method="POST">
             <div class="form-control">
                 <label for="email">E-Mail</label>
                 <input 
@@ -21,7 +24,7 @@
                     type="email" 
                     name="email" 
                     id="title" 
-
+                    value="<%= oldInput.email %>" >
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
@@ -39,6 +42,7 @@
                     type="password"
                     name="confirmPassword"
                     id="confirmPassword" 
+                    
             </div>
             <button class="btn" type="submit">SignUp</button>
         </form>

@@ -13,6 +13,9 @@
     <%- include('./navigation.ejs') %>
 
     <main>
+        <% if (errorMessage) { %>
+            <div class= "user-message user-message--error"><%= errorMessage %></div>
+        <% } %>
         <form class="login-form" action="/login" method="POST" novalidate>
             <div class="form-control">
                 <label for="email">E-Mail</label>
@@ -21,7 +24,7 @@
                     type="email" 
                     name="email" 
                     id="title" 
-
+                    value="<%= oldInput.email %>" >
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
