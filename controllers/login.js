@@ -2,6 +2,7 @@
 const User = require('../models/user')
 const bcrypt = require('bcryptjs')
 const keys = require('../private/keys');
+const crypto = require('crypto')
 // //validation
 // const { validationResult } = require('express-validator/check')
 // //mailing services:
@@ -67,12 +68,18 @@ exports.getSignup = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
+    let eMessage = req.flash('error')
     User.findOne({email:email})
     .then(foundUser => {
         if (!foundUser){
-            oldInput: {email:email}
             req.flash('error', 'Incorrect email or password.');
-            res.redirect('/');
+            res.render('login', {
+                pageTitle: 'Login',
+                path: '/',
+                isLoggedIn: req.session.isLoggedIn ,
+                errorMessage: eMessage,
+                oldInput: {email:email}
+            });
         }
         bcrypt.compare(password, foundUser.password).then(match => {
             if (match){
@@ -84,10 +91,15 @@ exports.postLogin = (req, res, next) => {
                 
             }
             else {
-                oldInput: {email:email}
                 req.flash('error', 'Incorrect email or password.');
-                res.redirect('/');
-                console.log('wrong password goober')
+                res.render('login', {
+                    pageTitle: 'Login',
+                    path: '/',
+                    isLoggedIn: req.session.isLoggedIn ,
+                    errorMessage: eMessage,
+                    oldInput: {email:email}
+                });
+                
             }
         })
 
@@ -151,6 +163,119 @@ exports.postLogout = (req, res, next) => {
 }
 
 
-// if (!req.session.isLoggedIn) {
-//     res.redirect('/')
-// }
+
+exports.getReset = (req, res, next) => {
+    let eMessage = req.flash('error')
+
+    if (eMessage.length > 0){
+        eMessage = eMessage[0];
+    } else {
+        eMessage = null;
+    }
+    res.render('reset', {
+        path: '/reset',
+        isLoggedIn: req.session.isLoggedIn,
+        pageTitle: 'Reset Password',
+        errorMessage: eMessage
+    })
+}
+
+
+exports.postReset = (req, res, next) => {
+    userEmail = req.body.email
+    crypto.randomBytes(16, (err, buffer) =>{
+        if (err) {
+            return res.redirect('/reset');
+        }
+        const token = buffer.toString('hex');
+        User.findOne({email: userEmail}).then(foundUser => {
+            if (!foundUser){
+                req.flash('error', 'That email wasnt found.');
+                return res.redirect('/reset');
+            }
+            foundUser.resetKey = token;
+            foundUser.resetKeyExpiration = Date.now() + 1800000;
+            return foundUser.save();
+        })
+        .then(result => {
+            res.redirect('/');
+            transporter.sendMail({
+                to: userEmail,
+                from: 'mathewcseal@gmail.com',
+                subject: 'Password Reset',
+                html: `<p>You've requested to reset your email</p>
+                <p>click <a href="http://localhost:3000/reset/${token}">here</a> to reset your password</p>
+                (This is valid for 30 minutes)
+                `
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    })
+}
+
+
+exports.getNewPassword = (req, res, next) => {
+    const key = req.params.key;
+  
+    User.findOne({resetKey: key, resetKeyExpiration: {$gt: Date.now()}})
+    .then(user => {
+ 
+        let eMessage = req.flash('error')
+
+        if (eMessage.length > 0){
+            eMessage = eMessage[0];
+        } else {
+            eMessage = null;
+        }
+        res.render('new-password', {
+            path: '/new-password',
+            pageTitle:'Make a new Password',
+            isLoggedIn: req.session.isLoggedIn,
+            errorMessage: eMessage,
+            userId: user._id.toString(),
+            passwordKey: key
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
+
+
+}
+
+exports.postNewPassword = (req, res, next) => {
+    const newPassword = req.body.password;
+    const userId = req.body.userId;
+    const passwordKey= req.body.passwordKey;
+    let resetUser;
+
+    User.findOne({
+        resetKey: passwordKey,
+        resetKeyExpiration: { $gt: Date.now() },
+        _id: userId
+      })
+    .then(user => {
+        resetUser = user;
+        return bcrypt.hash(newPassword, 12);
+    })
+    .then(hashedPassword => {
+        resetUser.password = hashedPassword;
+        resetUser.resetKey = undefined;
+        resetUser.resetKeyExpiration = undefined;
+        return resetUser.save()
+    })
+    .then(result => {
+        res.redirect('/');
+        transporter.sendMail({
+            to: userEmail,
+            from: 'mathewcseal@gmail.com',
+            subject: 'Password Reset',
+            html: `<p>You've reset your password!</p>`
+        });
+        
+    })
+    .catch(err => console.log(err))
+
+};
