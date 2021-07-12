@@ -12,6 +12,8 @@ const session = require('express-session');
 //this is seperate package connects session to mongodb
 const MongoDBStore = require('connect-mongodb-session')(session);
 
+//for 404/500 page
+const loginController = require('./controllers/login')
 
 const MONGODB_CREDS = keys.MONGODB
 
@@ -27,7 +29,9 @@ const userApp = new MongoDBStore({
 
 
 //to add: validation, 405 error, other stuff?
-//
+
+
+
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -50,6 +54,17 @@ app.use(
 
 app.use(flash());
 app.use(loginRoutes);
+
+
+//500 error page
+app.get('/500', loginController.get500);
+
+//this is the 404 page, 
+app.use(loginController.get404);
+
+
+
+
 
 
 mongoose.connect(MONGODB_CREDS)
