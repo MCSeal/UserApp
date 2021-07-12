@@ -9,7 +9,7 @@ const crypto = require('crypto')
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const { getMaxListeners } = require('../models/user');
-
+const {validationResult} = require('express-validator/check');
 
 
 
@@ -68,16 +68,26 @@ exports.getSignup = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()){
+        return res.status(422).render('login', {
+            pageTitle: 'Login',
+            path: '/',
+            isLoggedIn: req.session.isLoggedIn ,
+            errorMessage: errors.array()[0].msg,
+            oldInput: {email:email}
+        });
+    }
     let eMessage = req.flash('error')
     User.findOne({email:email})
     .then(foundUser => {
         if (!foundUser){
-            req.flash('error', 'Incorrect email or password.');
-            res.render('login', {
+            return res.status(422).render('login', {
                 pageTitle: 'Login',
                 path: '/',
                 isLoggedIn: req.session.isLoggedIn ,
-                errorMessage: eMessage,
+                errorMessage: 'No account with that Email found.',
                 oldInput: {email:email}
             });
         }
@@ -90,17 +100,13 @@ exports.postLogin = (req, res, next) => {
                 })
                 
             }
-            else {
-                req.flash('error', 'Incorrect email or password.');
-                res.render('login', {
-                    pageTitle: 'Login',
-                    path: '/',
-                    isLoggedIn: req.session.isLoggedIn ,
-                    errorMessage: eMessage,
-                    oldInput: {email:email}
-                });
-                
-            }
+            return res.status(422).render('login', {
+                pageTitle: 'Login',
+                path: '/',
+                isLoggedIn: req.session.isLoggedIn ,
+                errorMessage: 'Incorrect email or password.',
+                oldInput: {email:email}
+            });
         })
 
 
@@ -115,23 +121,20 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
-    const confirmPassword = req.body.confirmPassword;
+    //validation
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+       return res.status(422).render('signup', {
+            pageTitle: 'Signup',
+            path: '/signup',
+            isLoggedIn: req.session.isLoggedIn,
+            errorMessage: errors.array()[0].msg,
+            oldInput:{email: email}
+        })
 
-    User.findOne({email:email}).then( foundUser =>{
-        if (foundUser){
-            oldInput: {email:email}
-            req.flash('error', 'Email already in use!.');
-            res.redirect('/signup');
-        }
-    })
-
-    if (password != confirmPassword){
-        req.flash('error', 'Passwords need to match.');
-        oldInput: {email:email}
-        res.redirect('/signup');
     }
-
-    bcrypt.hash(password, 12)
+    bcrypt
+    .hash(password, 12)
     .then(encryptPassword => {
         const user = new User({
             email: email,
@@ -148,7 +151,6 @@ exports.postSignup = (req, res, next) => {
             html: '<h1>Thank you for taking a look at my user-app demo!<h1>'
         });
     })
-
 
     .catch(err => {
         console.log(err)
@@ -188,9 +190,10 @@ exports.postReset = (req, res, next) => {
             return res.redirect('/reset');
         }
         const token = buffer.toString('hex');
-        User.findOne({email: userEmail}).then(foundUser => {
+        User.findOne({email: userEmail})
+        .then(foundUser => {
             if (!foundUser){
-                req.flash('error', 'That email wasnt found.');
+                req.flash('error', 'No account with that Email was found.');
                 return res.redirect('/reset');
             }
             foundUser.resetKey = token;
