@@ -63,6 +63,13 @@ app.get('/500', loginController.get500);
 app.use(loginController.get404);
 
 
+app.use((error, req, res, next) => {
+    res.status(500).render('500', {
+        pageTitle: 'Error!',
+        path: '/500',
+        isLoggedIn: req.session.isLoggedIn 
+    });
+});
 
 
 

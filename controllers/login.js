@@ -93,7 +93,6 @@ exports.postLogin = (req, res, next) => {
         }
         bcrypt.compare(password, foundUser.password).then(match => {
             if (match){
-                console.log('success!')
                 req.session.isLoggedIn = true;
                 return req.session.save((err) => {
                     res.redirect('/');
@@ -112,9 +111,10 @@ exports.postLogin = (req, res, next) => {
 
     })
     .catch(err => {
-        console.log(err);
-        
-      })
+        const error = new Error(err)
+        error.httpStatusCode = 500;
+        return next(error);
+    });
 }
 
 
@@ -153,8 +153,10 @@ exports.postSignup = (req, res, next) => {
     })
 
     .catch(err => {
-        console.log(err)
-    })
+        const error = new Error(err)
+        error.httpStatusCode = 500;
+        return next(error);
+    });
 }
 
 exports.postLogout = (req, res, next) => {
@@ -213,8 +215,10 @@ exports.postReset = (req, res, next) => {
             });
         })
         .catch(err => {
-            console.log(err);
-        })
+            const error = new Error(err)
+            error.httpStatusCode = 500;
+            return next(error);
+        });
     })
 }
 
@@ -242,8 +246,10 @@ exports.getNewPassword = (req, res, next) => {
         })
     })
     .catch(err => {
-        console.log(err)
-    })
+        const error = new Error(err)
+        error.httpStatusCode = 500;
+        return next(error);
+    });
 
 
 }
@@ -279,7 +285,11 @@ exports.postNewPassword = (req, res, next) => {
         });
         
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+        const error = new Error(err)
+        error.httpStatusCode = 500;
+        return next(error);
+    });
 
 };
 
@@ -296,7 +306,7 @@ exports.get404 = (req, res, next) => {
 
 exports.get500 = (req, res, next) => {
     res.status(500).render('500', {
-        pageTitle: 'Error!',
+        pageTitle: 'Error',
         path: '/500',
         isLoggedIn: req.session.isLoggedIn
     });
