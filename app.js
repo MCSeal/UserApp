@@ -22,7 +22,7 @@ const app = express();
 
 
 const userApp = new MongoDBStore({
-    uri: MONGODB_CREDS,
+    uri: `${process.env.MONGO}`,
     collection: 'sessions'
 })
 
@@ -45,7 +45,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
     session({
-        secret:keys.SECRET,
+        secret:process.env.SECRET,
         resave: false,
         saveUninitialized: false,
         store: userApp 
@@ -74,9 +74,9 @@ app.use((error, req, res, next) => {
 
 
 
-mongoose.connect(MONGODB_CREDS)
+mongoose.connect(`${process.env.MONGO}`)
 .then(result => {
-    app.listen(3000);
+    app.listen(process.env.PORT || 3000);
 })
 .catch(err => {
     console.log(err);
