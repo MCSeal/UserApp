@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const path = require('path')
-const keys = require('../private/keys')
+
 //messaging flashing
 const flash = require('connect-flash');
 
@@ -45,7 +45,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
     session({
-        secret:process.env.SECRET,
+        secret: process.env.SECRET,
         resave: false,
         saveUninitialized: false,
         store: userApp 
