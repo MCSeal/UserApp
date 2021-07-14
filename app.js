@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const path = require('path')
-const keys = require('./private/keys')
+const keys = require('../private/keys')
 //messaging flashing
 const flash = require('connect-flash');
 
@@ -13,7 +13,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 
 //for 404/500 page
-const loginController = require('./controllers/login')
+const loginController = require('../controllers/login')
 
 const MONGODB_CREDS = keys.MONGODB
 
@@ -35,7 +35,7 @@ const userApp = new MongoDBStore({
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
-const loginRoutes = require('./routes/login')
+const loginRoutes = require('../routes/login')
 
 app.use(bodyParser.urlencoded({extended: false}));
 
