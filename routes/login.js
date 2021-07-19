@@ -40,6 +40,13 @@ router.post('/signup',
 
 ], loginController.postSignup);
 
+//feed
+router.get('/feed', loginController.getFeed);
+router.get('/newpost', loginController.getNewPost);
+router.post('/newpost', loginController.PostNewPost);
+
+
+//Login/Auth Files:
 router.get('/', loginController.getLogin);
 router.post('/login', [
     body('email')
@@ -52,7 +59,6 @@ router.post('/login', [
 ], loginController.postLogin);
 
 router.post('/logout', loginController.postLogout)
-
 
 router.get('/reset', loginController.getReset);
 

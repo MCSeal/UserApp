@@ -15,7 +15,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 //for 404/500 page
 const loginController = require('./controllers/login')
 
-const MONGODB_CREDS = keys.MONGODB
+const MONGODB_CREDS = keys.MONGO
 
 
 const app = express();
@@ -56,20 +56,20 @@ app.use(flash());
 app.use(loginRoutes);
 
 
-//500 error page
-app.get('/500', loginController.get500);
+// //500 error page
+// app.get('/500', loginController.get500);
 
-//this is the 404 page, 
-app.use(loginController.get404);
+// //this is the 404 page, 
+// app.use(loginController.get404);
 
 
-app.use((error, req, res, next) => {
-    res.status(500).render('500', {
-        pageTitle: 'Error!',
-        path: '/500',
-        isLoggedIn: req.session.isLoggedIn 
-    });
-});
+// app.use((error, req, res, next) => {
+//     res.status(500).render('500', {
+//         pageTitle: 'Error!',
+//         path: '/500',
+//         isLoggedIn: req.session.isLoggedIn 
+//     });
+// });
 
 
 

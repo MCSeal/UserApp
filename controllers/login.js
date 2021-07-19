@@ -43,6 +43,68 @@ exports.getLogin = (req, res, next) => {
     })
 };
 
+exports.getFeed = (req, res, next) => {
+    let eMessage = req.flash('error')
+
+    if (eMessage.length > 0){
+        eMessage = eMessage[0];
+    } else {
+        eMessage = null;
+    }
+
+
+    res.render('Feed', {
+        pageTitle: 'Feed',
+        path: '/feed',
+        isLoggedIn: req.session.isLoggedIn ,
+        errorMessage: eMessage,
+        oldInput:{
+            email:''
+        }
+    })
+};
+
+exports.getNewPost = (req, res, next) => {
+    if (!req.session.isLoggedIn){
+        return res.redirect('/')
+    }
+
+    let eMessage = req.flash('error')
+
+    if (eMessage.length > 0){
+        eMessage = eMessage[0];
+    } else {
+        eMessage = null;
+    }
+
+
+    res.render('newpost', {
+        pageTitle: 'New Post',
+        path: '/newpost',
+        isLoggedIn: req.session.isLoggedIn ,
+        errorMessage: eMessage,
+        oldInput:{
+            email:''
+        }
+    })
+};
+
+exports.PostNewPost = (req, res, next) => {
+    const title = req.body.title;
+    const content = req.body.content
+    
+    
+    let eMessage = req.flash('error')
+
+    if (eMessage.length > 0){
+        eMessage = eMessage[0];
+    } else {
+        eMessage = null;
+    }
+
+
+};
+
 exports.getSignup = (req, res, next) => {
     let eMessage = req.flash('error')
 
@@ -95,7 +157,7 @@ exports.postLogin = (req, res, next) => {
             if (match){
                 req.session.isLoggedIn = true;
                 return req.session.save((err) => {
-                    res.redirect('/');
+                    res.redirect('/feed');
                 })
                 
             }
