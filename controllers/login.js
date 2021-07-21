@@ -1,10 +1,11 @@
 
-const User = require('../models/user')
-const bcrypt = require('bcryptjs')
+const User = require('../models/user');
+const Post = require('../models/post');
+const bcrypt = require('bcryptjs');
 const keys = require('../private/keys');
-const crypto = require('crypto')
-// //validation
-// const { validationResult } = require('express-validator/check')
+const crypto = require('crypto');
+
+
 // //mailing services:
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
@@ -45,7 +46,8 @@ exports.getLogin = (req, res, next) => {
 
 exports.getFeed = (req, res, next) => {
     let eMessage = req.flash('error')
-
+    console.log('HERE')
+    console.log(req.user)
     if (eMessage.length > 0){
         eMessage = eMessage[0];
     } else {
@@ -101,8 +103,22 @@ exports.PostNewPost = (req, res, next) => {
     } else {
         eMessage = null;
     }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+        //error handling
+    }
 
-
+    const post = new Post({
+        title: title,
+        content: content,
+        replies: [],
+        userId: req.user
+    });
+    post.save().then(result => {
+        console.log(post);
+        res.redirect('/feed')
+        
+    })
 };
 
 exports.getSignup = (req, res, next) => {
@@ -156,6 +172,7 @@ exports.postLogin = (req, res, next) => {
         bcrypt.compare(password, foundUser.password).then(match => {
             if (match){
                 req.session.isLoggedIn = true;
+                req.session.user = foundUser;
                 return req.session.save((err) => {
                     res.redirect('/feed');
                 })
