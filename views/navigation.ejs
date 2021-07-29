@@ -4,9 +4,13 @@
     <nav class="main-header__nav">
         <ul class="main-header__item-list">
             <li class="main-header__item">
+                <% if (!isLoggedIn) { %>
                 <a class="<%= path === '/' ? 'active' : '' %>" href="/">Login</a>
+                    <% } %>
             </li>
-
+            <li class="main-header__item">
+                <a class="<%= path === '/feed' ? 'active' : '' %>" href="/feed">Feed</a>
+            </li>
 
         </ul>
         <ul class="main-header__item-list">

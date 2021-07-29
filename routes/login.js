@@ -22,6 +22,18 @@ router.post('/signup',
             });    
         })
         .normalizeEmail(),
+        body('username')
+            .isLength({ min: 5 })
+            .withMessage('5 character minimum for username.')
+            .custom((value, { rec }) => {
+                return User.findOne({ username: value })
+                .then(userDoc =>{
+                    if (userDoc){
+                        //if find email arleady used
+                        return Promise.reject('Username already taken, please try a different one.');
+                    }
+                });    
+            }),
     body(
         'password',
         'Please enter a password with min 5 characters and that is alphanumeric.'
@@ -40,6 +52,16 @@ router.post('/signup',
 
 ], loginController.postSignup);
 
+//feed
+router.get('/feed', loginController.getFeed);
+router.get('/newpost', loginController.getNewPost);
+router.post('/newpost', loginController.PostNewPost);
+
+router.get('/reply/:postId', loginController.getNewReply);
+router.post('/reply', loginController.postNewReply);
+
+
+//Login/Auth Files:
 router.get('/', loginController.getLogin);
 router.post('/login', [
     body('email')
@@ -52,7 +74,6 @@ router.post('/login', [
 ], loginController.postLogin);
 
 router.post('/logout', loginController.postLogout)
-
 
 router.get('/reset', loginController.getReset);
 

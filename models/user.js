@@ -11,9 +11,13 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    username : {
+        type: String,
+        required: true
+    },
     resetKey: String,
     resetKeyExpiration: Date
 
 })
 
-module.exports = mongoose.model('user', userSchema)
+module.exports = mongoose.model('User', userSchema)

@@ -12,13 +12,16 @@ const session = require('express-session');
 //this is seperate package connects session to mongodb
 const MongoDBStore = require('connect-mongodb-session')(session);
 
+const User = require('./models/user');
+
 //for 404/500 page
 const loginController = require('./controllers/login')
 
-const MONGODB_CREDS = keys.MONGODB
+const MONGODB_CREDS = keys.MONGO
 
 
 const app = express();
+
 
 
 const userApp = new MongoDBStore({
@@ -28,9 +31,37 @@ const userApp = new MongoDBStore({
 
 
 
-//to add: validation, 405 error, other stuff?
+app.use(
+    session({
+        secret:keys.SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: userApp 
+    })
+);
 
 
+//middleware to store/access user from outside this file
+//npm start does not run the middle ware functions such as these
+app.use((req, res, next) =>{
+    if (!req.session.user){
+        return next();
+    }
+    User.findById(req.session.user._id)
+    .then(user =>{
+       if (!user){
+           console.log('no user')
+           return next();
+       }
+       console.log(req.user)
+        req.user = user;
+        next();
+    })
+    .catch(err => {
+        //inside async you need to use this way to throw error
+        next(new Error(err));
+    })
+});
 
 
 app.set('view engine', 'ejs');
@@ -43,33 +74,26 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'public')));
 //middle ware for sessions
 
-app.use(
-    session({
-        secret: process.env.SECRET,
-        resave: false,
-        saveUninitialized: false,
-        store: userApp 
-    })
-);
+
 
 app.use(flash());
 app.use(loginRoutes);
 
 
-//500 error page
-app.get('/500', loginController.get500);
+// //500 error page
+// app.get('/500', loginController.get500);
 
-//this is the 404 page, 
-app.use(loginController.get404);
+// //this is the 404 page, 
+// app.use(loginController.get404);
 
 
-app.use((error, req, res, next) => {
-    res.status(500).render('500', {
-        pageTitle: 'Error!',
-        path: '/500',
-        isLoggedIn: req.session.isLoggedIn 
-    });
-});
+// app.use((error, req, res, next) => {
+//     res.status(500).render('500', {
+//         pageTitle: 'Error!',
+//         path: '/500',
+//         isLoggedIn: req.session.isLoggedIn 
+//     });
+// });
 
 
 
