@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const path = require('path')
-const keys = require('./private/keys')
+
 //messaging flashing
 const flash = require('connect-flash');
 
@@ -25,7 +25,7 @@ const app = express();
 
 
 const userApp = new MongoDBStore({
-    uri: MONGODB_CREDS,
+    uri: `${process.env.MONGO}`,
     collection: 'sessions'
 })
 
@@ -75,6 +75,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //middle ware for sessions
 
 
+
 app.use(flash());
 app.use(loginRoutes);
 
@@ -97,9 +98,9 @@ app.use(loginRoutes);
 
 
 
-mongoose.connect(MONGODB_CREDS)
+mongoose.connect(`${process.env.MONGO}`)
 .then(result => {
-    app.listen(3000);
+    app.listen(process.env.PORT || 3000);
 })
 .catch(err => {
     console.log(err);
