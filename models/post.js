@@ -13,6 +13,10 @@ const postSchema = new Schema({
     },
     replies: [ this ],
     required: false,
+    username: {
+        type: String,
+        required: true
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'user'

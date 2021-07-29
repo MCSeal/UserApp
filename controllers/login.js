@@ -46,24 +46,28 @@ exports.getLogin = (req, res, next) => {
 
 exports.getFeed = (req, res, next) => {
     let eMessage = req.flash('error')
-    console.log('HERE')
-    console.log(req.user)
+    
     if (eMessage.length > 0){
         eMessage = eMessage[0];
     } else {
         eMessage = null;
     }
 
-
-    res.render('Feed', {
-        pageTitle: 'Feed',
-        path: '/feed',
-        isLoggedIn: req.session.isLoggedIn ,
-        errorMessage: eMessage,
-        oldInput:{
-            email:''
-        }
+    Post.find()
+    .then(posts => {
+        console.log(posts)
+        res.render('Feed', {
+            pageTitle: 'Feed',
+            path: '/feed',
+            posts: posts,
+            isLoggedIn: req.session.isLoggedIn ,
+            errorMessage: eMessage,
+            oldInput:{
+                email:''
+            }
+        })
     })
+
 };
 
 exports.getNewPost = (req, res, next) => {
@@ -112,13 +116,82 @@ exports.PostNewPost = (req, res, next) => {
         title: title,
         content: content,
         replies: [],
+        username: req.user.username,
         userId: req.user
+        
     });
     post.save().then(result => {
         console.log(post);
         res.redirect('/feed')
         
     })
+};
+
+exports.getNewReply = (req, res, next) => {
+    const postId = req.params.postId;
+
+    if (!req.session.isLoggedIn){
+        return res.redirect('/')
+    }
+
+    let eMessage = req.flash('error')
+
+    if (eMessage.length > 0){
+        eMessage = eMessage[0];
+    } else {
+        eMessage = null;
+    }
+    
+    res.render('reply', {
+        pageTitle: 'New Reply',
+        path: '/reply',
+        isLoggedIn: req.session.isLoggedIn ,
+        errorMessage: eMessage,
+        id: postId,
+        oldInput:{}
+    })
+};
+
+exports.postNewReply = (req, res, next) => {
+    const title = req.body.title;
+    const content = req.body.content
+    const postId = req.body.postId;
+
+
+
+    if (!req.session.isLoggedIn){
+        return res.redirect('/')
+    }
+
+    let eMessage = req.flash('error')
+
+    if (eMessage.length > 0){
+        eMessage = eMessage[0];
+    } else {
+        eMessage = null;
+    }
+  
+    
+    Post.findById(postId)
+    .then(post => {
+        if (!post){
+            return res.redirect('/feed'); 
+         }
+         console.log('first')
+         console.log(post.replies)
+        post.replies.push({
+            title: title,
+            content: content,
+            username: req.user.username,
+            userId: req.user
+        })
+        return post.save().then(result => {
+            console.log(post);
+            res.redirect('/feed')
+            
+        })
+    })
+
 };
 
 exports.getSignup = (req, res, next) => {
@@ -200,9 +273,11 @@ exports.postLogin = (req, res, next) => {
 exports.postSignup = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
+    const username = req.body.username;
     //validation
     const errors = validationResult(req);
     if (!errors.isEmpty()){
+        console.log(username)
        return res.status(422).render('signup', {
             pageTitle: 'Signup',
             path: '/signup',
@@ -217,7 +292,8 @@ exports.postSignup = (req, res, next) => {
     .then(encryptPassword => {
         const user = new User({
             email: email,
-            password: encryptPassword
+            password: encryptPassword,
+            username: username,
         });
         return user.save()
     })
@@ -227,7 +303,13 @@ exports.postSignup = (req, res, next) => {
             to: email,
             from: 'mathewcseal@gmail.com',
             subject: 'Thanks for signing-up!',
-            html: '<h1>Thank you for taking a look at my user-app demo!<h1>'
+            html: 
+
+            `
+            
+                <h1>Thank you ${username} for taking a look at my user-app demo!<h1>
+            
+            `
         });
     })
 

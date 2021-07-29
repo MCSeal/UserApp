@@ -64,15 +64,6 @@ app.use((req, res, next) =>{
 });
 
 
-
-
-
-//to add: validation, 405 error, other stuff?
-
-
-
-
-
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 const loginRoutes = require('./routes/login')

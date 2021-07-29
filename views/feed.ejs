@@ -13,9 +13,55 @@
     <%- include('./navigation.ejs') %>
     <main>
         <form class="post-form" action="/newpost" method="GET">
-
             <button class="btn" >Make a new Post</button>
         </form>
+        <% if (posts.length > 0) { %>
+        <div class="">
+            <% for (let post of posts) { %>
+                <article class="card product-item">
+                    <header class="card__header">
+                        <h1 class="product__title">
+                            <%= post.title %> by <%= post.username %>
+                        </h1>
+                    </header>
+                    <div class="card__content">
+                        <p class="product__description">
+                            <%= post.content %>
+                        </p>
+                    </div>
+                    <form class="post-form" action="/reply/<%= post._id%>" method="GET">
+                        
+                        <button class="btn" >Reply</button>
+                    </form>
+                </article>
+                <% if (post.replies) { %>
+                    <% for (let reply of post.replies) { %>
+                        <article class="card product-item">
+                            <header class="card__header">
+                                <h1 class="product__title">
+                                    <%= reply.title %> by <%= reply.username %>
+                                </h1>
+                            </header>
+                            <div class="card__content">
+                                <p class="product__description">
+                                    <%= reply.content %>
+                                </p>
+                            </div>
+                            <form class="post-form" action="/reply/<%= post._id%>" method="GET">
+                                
+                                <button class="btn" >Reply</button>
+                            </form>
+                        </article>
+                        <% } %>
+                    
+                    <% } %>
+
+            <% } %>
+
+        </div>
+
+        <% } else { %>
+
         <h1 class = "centered">No Posts Found!</h1>
-               
+            <% } %>   
     </main>
