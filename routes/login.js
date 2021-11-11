@@ -60,6 +60,11 @@ router.post('/newpost', loginController.PostNewPost);
 router.get('/reply/:postId', loginController.getNewReply);
 router.post('/reply', loginController.postNewReply);
 
+//new stuff 
+router.get('/thread/:postId', loginController.getThread);
+
+
+
 
 //Login/Auth Files:
 router.get('/', loginController.getLogin);

@@ -70,6 +70,33 @@ exports.getFeed = (req, res, next) => {
 
 };
 
+exports.getThread = (req, res, next) => {
+    const postId = req.params.postId;
+    let eMessage = req.flash('error')
+    
+    if (eMessage.length > 0){
+        eMessage = eMessage[0];
+    } else {
+        eMessage = null;
+    }
+
+    Post.findById(postId)
+    .then(post => {
+        console.log(post)
+        res.render('Thread', {
+            pageTitle: post.title,
+            path: '/thread',
+            post: post,
+            replies: post.replies,
+            isLoggedIn: req.session.isLoggedIn ,
+            errorMessage: eMessage,
+            oldInput:{
+                email:''
+            }
+        })
+    })
+
+};
 exports.getNewPost = (req, res, next) => {
     if (!req.session.isLoggedIn){
         return res.redirect('/')
@@ -177,8 +204,6 @@ exports.postNewReply = (req, res, next) => {
         if (!post){
             return res.redirect('/feed'); 
          }
-         console.log('first')
-         console.log(post.replies)
         post.replies.push({
             title: title,
             content: content,
@@ -187,7 +212,7 @@ exports.postNewReply = (req, res, next) => {
         })
         return post.save().then(result => {
             console.log(post);
-            res.redirect('/feed')
+            res.redirect('/thread/' + postId)
             
         })
     })
