@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const path = require('path')
-// const keys = require('./private/keys')
+// const MONGO_API_KEY = require('./private/mongokey')
+// const SECRET_KEY = require('./private/secret')
 //messaging flashing
 const flash = require('connect-flash');
 
@@ -17,7 +18,7 @@ const User = require('./models/user');
 //for 404/500 page
 const loginController = require('./controllers/login')
 
-const MONGODB_CREDS = keys.MONGO
+const MONGODB_CREDS = MONGO_API_KEY
 
 
 const app = express();
@@ -33,7 +34,7 @@ const userApp = new MongoDBStore({
 
 app.use(
     session({
-        secret:keys.SECRET,
+        secret: SECRET_KEY,
         resave: false,
         saveUninitialized: false,
         store: userApp 
