@@ -1,8 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const path = require('path')
-const MONGO_API_KEY = process.env.MONGO_API_KEY;
-const SECRET_KEY = process.env.SECRET_KEY;
+
 //messaging flashing
 const flash = require('connect-flash');
 
@@ -100,7 +99,7 @@ app.use(loginRoutes);
 
 mongoose.connect(MONGODB_CREDS)
 .then(result => {
-    app.listen(3000);
+    app.listen(process.env.PORT || 3000);
 })
 .catch(err => {
     console.log(err);
