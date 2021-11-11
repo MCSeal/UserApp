@@ -2,7 +2,7 @@
 const User = require('../models/user');
 const Post = require('../models/post');
 const bcrypt = require('bcryptjs');
-const keys = require('../private/keys');
+// const keys = require('../private/keys');
 const crypto = require('crypto');
 
 
