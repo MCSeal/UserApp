@@ -2,7 +2,7 @@
 const User = require('../models/user');
 const Post = require('../models/post');
 const bcrypt = require('bcryptjs');
-// const SENDGRID_API_KEY = require('../private/sendgridkey');
+const SENDGRID_API_KEY = require('../private/sendgridkey') || 'aliens';
 const crypto = require('crypto');
 
 
@@ -55,7 +55,7 @@ exports.getFeed = (req, res, next) => {
 
     Post.find()
     .then(posts => {
-        console.log(posts)
+        
         res.render('Feed', {
             pageTitle: 'Feed',
             path: '/feed',
@@ -82,7 +82,7 @@ exports.getThread = (req, res, next) => {
 
     Post.findById(postId)
     .then(post => {
-        console.log(post)
+        
         res.render('Thread', {
             pageTitle: post.title,
             path: '/thread',
@@ -148,7 +148,7 @@ exports.PostNewPost = (req, res, next) => {
         
     });
     post.save().then(result => {
-        console.log(post);
+        
         res.redirect('/feed')
         
     })

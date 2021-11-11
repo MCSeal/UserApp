@@ -1,8 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const path = require('path')
-// const MONGO_API_KEY = require('./private/mongokey')
-// const SECRET_KEY = require('./private/secret')
+const MONGO_API_KEY = require('./private/mongokey') || 'fake key';
+const SECRET_KEY = require('./private/secret') || 'fake key';
 //messaging flashing
 const flash = require('connect-flash');
 
