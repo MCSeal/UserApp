@@ -56,11 +56,11 @@ exports.getFeed = (req, res, next) => {
     Post.find()
     .then(posts => {
         
-        res.render('Feed', {
+        res.render('feed', {
             pageTitle: 'Feed',
             path: '/feed',
             posts: posts,
-            isLoggedIn: req.session.isLoggedIn ,
+            isLoggedIn: req.session.isLoggedIn,
             errorMessage: eMessage,
             oldInput:{
                 email:''
@@ -83,7 +83,7 @@ exports.getThread = (req, res, next) => {
     Post.findById(postId)
     .then(post => {
         
-        res.render('Thread', {
+        res.render('thread', {
             pageTitle: post.title,
             path: '/thread',
             post: post,
@@ -395,7 +395,7 @@ exports.postReset = (req, res, next) => {
                 from: 'mathewcseal@gmail.com',
                 subject: 'Password Reset',
                 html: `<p>You've requested to reset your email</p>
-                <p>click <a href="http://localhost:3000/reset/${token}">here</a> to reset your password</p>
+                <p>click <a href="https://user-app-ms.herokuapp.com/reset/${token}">here</a> to reset your password</p>
                 (This is valid for 30 minutes)
                 `
             });
