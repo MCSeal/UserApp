@@ -2,7 +2,7 @@
 const User = require('../models/user');
 const Post = require('../models/post');
 const bcrypt = require('bcryptjs');
-const SENDGRID_API_KEY = require('../private/sendgridkey') || 'aliens';
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 const crypto = require('crypto');
 
 
