@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser')
 const path = require('path')
-MONGO_API_KEY = "mongodb+srv://Sealyoulater:Inbox!123@cluster0.lctpx.mongodb.net/?retryWrites=true&w=majority"
+MONGO_API_KEY = process.env.MONGO_API_KEY || require('./private/mongokey');
 SECRET_KEY = process.env.SECRET_KEY || require('./private/secret');
 
 //messaging flashing
