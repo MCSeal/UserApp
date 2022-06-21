@@ -18,7 +18,7 @@ const User = require('./models/user');
 //for 404/500 page
 const loginController = require('./controllers/login')
 
-const MONGODB_CREDS = process.env.MONGO_API_KEY;
+const MONGODB_CREDS = 'mongodb+srv://Userapper:Doyoulikethis@cluster0.lctpx.mongodb.net/userapp';
 
 
 const app = express();
